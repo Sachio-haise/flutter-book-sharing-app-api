@@ -27,14 +27,16 @@ Route::middleware(['throttle:api'])->controller(UserController::class)->group(fu
     Route::post('logout', 'logout')->name('user-logout');
 });
 
-Route::middleware(['auth:sanctum','api'])->controller(UserController::class)->group(function () {
+Route::middleware(['auth:sanctum', 'api'])->controller(UserController::class)->group(function () {
     Route::post('update-profile', 'updateProfile')->name('user-profile-update');
     Route::post('upload-profile', 'uploadProfile')->name('user-profile-upload');
 });
 
+Route::controller(BookController::class)->group(function () {
+        Route::get('books', 'getBooks')->name('get-books');
+});
 
-Route::middleware(['auth:sanctum','api'])->controller(BookController::class)->group(function () {
-    Route::get('books', 'getBooks')->name('get-books');
+Route::middleware(['auth:sanctum', 'api'])->controller(BookController::class)->group(function () {
     Route::post('cart', 'getCart')->name('get-cart');
     Route::post('add-book', 'addBook')->name('add-book');
     Route::post('update-book/{id}', 'updateBook')->name('update-book');
