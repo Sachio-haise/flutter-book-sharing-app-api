@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('review');
             $table->string('photo_id');
             $table->string('book_id');
+            $table->string('status');
             $table->softDeletes();
             $table->timestamps();
         });

@@ -20,7 +20,8 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'profile' => $this->profile_id ? new MediaResource(MediaStorage::findOrFail($this->profile_id)) : null,
-            'description' => $this->description
+            'description' => $this->description,
+            'created_at' => $this->created_at
         ];
     }
 }

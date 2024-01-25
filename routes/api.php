@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\BookController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,17 +18,22 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+    return new UserResource($request->user());
 });
 
-Route::controller(UserController::class)->group(function () {
+Route::middleware(['throttle:api'])->controller(UserController::class)->group(function () {
     Route::post('login', 'login')->name('user-login');
     Route::post('register', 'register')->name('user-register');
     Route::post('logout', 'logout')->name('user-logout');
-})->middleware(['throttle:api']);
+});
+
+Route::middleware(['auth:sanctum','api'])->controller(UserController::class)->group(function () {
+    Route::post('update-profile', 'updateProfile')->name('user-profile-update');
+    Route::post('upload-profile', 'uploadProfile')->name('user-profile-upload');
+});
 
 
-Route::controller(BookController::class)->group(function () {
+Route::middleware(['auth:sanctum','api'])->controller(BookController::class)->group(function () {
     Route::get('books', 'getBooks')->name('get-books');
     Route::post('cart', 'getCart')->name('get-cart');
     Route::post('add-book', 'addBook')->name('add-book');
@@ -35,4 +41,4 @@ Route::controller(BookController::class)->group(function () {
     Route::delete('delete-book/{id}', 'deleteBook')->name('delete-book');
     Route::post('react-book', 'reactBook')->name('react-book');
     Route::post('add-to-cart', 'addToCart')->name('add-to-cart');
-})->middleware('auth:sanctum');
+});

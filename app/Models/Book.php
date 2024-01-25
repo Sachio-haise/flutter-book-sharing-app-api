@@ -18,7 +18,8 @@ class Book extends Model
         'description',
         'review',
         'photo_id',
-        'book_id'
+        'book_id',
+        'status'
     ];
 
     public function photo()

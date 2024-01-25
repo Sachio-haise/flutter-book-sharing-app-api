@@ -54,6 +54,7 @@ class BookController extends Controller
             'review' => 'required',
             'photo' => 'required',
             'book' => 'required',
+            'status' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -83,10 +84,11 @@ class BookController extends Controller
                 'description' => $request->description,
                 'review' => $request->review,
                 'photo_id' => $photo,
-                'book_id' => $book
+                'book_id' => $book,
+                'status' => $request->status
             ];
             $book = Book::create($data);
-            return response()->json(['data' => new BookResource($book), 'message' => 'Book added successfully!'], 200);
+            return response()->json(['data' => new BookResource($book), 'message' => 'Book added successfully!'], 201);
         } catch (Exception $e) {
             return response()->json(['errors' => $e->getMessage()], 500);
         }
@@ -127,6 +129,7 @@ class BookController extends Controller
             $book->name = $request->name;
             $book->description = $request->description;
             $book->review = $request->review;
+            $book->status = $request->status;
             $book->save();
             return response()->json(['data' => new BookResource($book), 'message' => 'Book modified successfully'], 200);
         } catch (Exception $e) {
@@ -161,7 +164,7 @@ class BookController extends Controller
 
             if($cart){
                 $cart->delete();
-                return response()->json(['message' => 'Book removed from cart successfully'], 200);
+                return response()->json(['message' => 'Book removed from cart successfully'], 201);
             }else{
                 $cart = new Cart();
                 $cart->user_id = $request->user_id;

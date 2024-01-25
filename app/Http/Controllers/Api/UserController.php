@@ -35,7 +35,6 @@ class UserController extends Controller
                 ]], 422);
             }
 
-            Auth::login($user);
             $token = $user->createToken($user->name, ['user:update'])->plainTextToken;
             return response()->json(['token' => $token, 'message' => 'Logged in successfully!'], 200);
         } catch (Exception $e) {
@@ -68,8 +67,7 @@ class UserController extends Controller
 
             event(new Registered($user));
 
-            Auth::login($user);
-            return response()->json(['token' => $token, 'message' => 'Registered successfully!'], 200);
+            return response()->json(['token' => $token, 'message' => 'Registered successfully!'], 201);
         } catch (\Exception $e) {
             return response()->json(['errors' => $e->getMessage()], 500);
         }
@@ -106,22 +104,57 @@ class UserController extends Controller
             $user->password =  Hash::make($request->password);
             $user->description = $request->description;
             $user->save();
-            Auth::login($user);
             $token = $user->createToken($user->name, ['user:update'])->plainTextToken;
-            return response()->json(['token' => $token, 'message' => 'Profile updated successfully'], 201);
+            return response()->json(['token' => $token, 'message' => 'Profile updated successfully'], 200);
         } catch (Exception $e) {
             return response()->json([
                 'status' => 500,
-                'message' => $e
-            ]);
+                'message' => $e->getMessage()
+            ], 500);
         }
+    }
+
+    public function uploadProfile(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+            'profile' => 'required|file',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+
+        try {
+            $user = User::findOrFail($request->id);
+
+            if ($request->hasFile('profile')) {
+                $response = Storage::upload($request->profile, User::class, $user->profile_id, $request->profile);
+                if ($response['status'] === 1) {
+                    $media_id = $response['data']['id'] ?? null;
+                    $user->profile_id = $media_id;
+                } else {
+                    throw new Exception($response['message']);
+                }
+            }
+
+            $user->save();
+            $token = $user->createToken($user->name, ['user:update'])->plainTextToken;
+            return response()->json(['token' => $token, 'message' => 'Profile uploaded successfully'], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ],500);
+        }
+
     }
 
     public function logout(Request $request)
     {
         try {
-            // $request->session()->invalidate();
-            // $request->session()->regenerateToken();
             return response()->json(['message' => 'Logged out successfully!'], 200);
         } catch (Exception $e) {
             return response()->json(['errors' => $e->getMessage()], 500);
