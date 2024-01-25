@@ -98,6 +98,12 @@ class BookController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'user' => 'required',
+            'name' => 'required|max:255',
+            'description' => 'required',
+            'review' => 'required',
+            'photo' => 'required',
+            'book' => 'required',
+            'status' => 'required'
         ]);
 
         if ($validator->fails()) {
