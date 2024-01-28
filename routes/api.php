@@ -29,6 +29,7 @@ Route::middleware(['throttle:api'])->controller(UserController::class)->group(fu
 
 Route::middleware(['auth:sanctum', 'api'])->controller(UserController::class)->group(function () {
     Route::post('update-profile', 'updateProfile')->name('user-profile-update');
+    Route::post('change-password', 'changePassword')->name('user-password-change');
     Route::post('upload-profile', 'uploadProfile')->name('user-profile-upload');
 });
 

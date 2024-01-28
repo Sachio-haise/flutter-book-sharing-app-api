@@ -73,13 +73,40 @@ class UserController extends Controller
         }
     }
 
+    public function changePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+            'password' => 'required',
+            'old_password' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        try {
+            $user = User::findOrFail($request->id);
+            if (!Hash::check($request->old_password, $user->password)) {
+                return response()->json(['errors' => [
+                    'old_password' => ['Credentials do not match.'],
+                ]], 422);
+            }
+            $user->password = Hash::make($request->password);
+            $user->save();
+            $token = $user->createToken($user->name, ['user:update'])->plainTextToken;
+            return response()->json(['token' => $token, 'message' => 'Password Updated successfully!'], 200);
+        } catch (Exception $e) {
+            return response()->json(['errors' => $e->getMessage()], 500);
+        }
+    }
+
     public function updateProfile(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'id' => 'required',
             'name' => 'required',
             'email' => 'required|exists:users',
-            'password' => 'required|min:6'
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -101,7 +128,6 @@ class UserController extends Controller
             }
             $user->name = $request->name;
             $user->email = $request->email;
-            $user->password =  Hash::make($request->password);
             $user->description = $request->description;
             $user->save();
             $token = $user->createToken($user->name, ['user:update'])->plainTextToken;

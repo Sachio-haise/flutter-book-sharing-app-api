@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use App\Models\MediaStorage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Carbon;
 
 class UserResource extends JsonResource
 {
@@ -21,7 +22,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'profile' => $this->profile_id ? new MediaResource(MediaStorage::findOrFail($this->profile_id)) : null,
             'description' => $this->description,
-            'created_at' => $this->created_at
+            'created_at' =>  Carbon::parse($this->created_at)->diffForHumans()
         ];
     }
 }
