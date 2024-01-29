@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Media\Storage;
+use App\Mail\ForgetPasswordMail;
 use App\Models\User;
 use Exception;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -178,12 +179,56 @@ class UserController extends Controller
 
     }
 
-    public function logout(Request $request)
+    public function forgetPassword(Request $request)
     {
-        try {
-            return response()->json(['message' => 'Logged out successfully!'], 200);
-        } catch (Exception $e) {
-            return response()->json(['errors' => $e->getMessage()], 500);
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        try{
+            $user = User::where('email', $request->email)->first();
+            $code = rand(100000, 999999);
+            $mailData =[
+                'name' => $user->name,
+                'code' => $code
+            ];
+            Mail::to($user->email)->send(new ForgetPasswordMail($mailData));
+            return response()->json(['code' => $code, 'message' => 'Mail sent successfully!'], 200);
+        }catch(Exception $e){
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ],500);
+        }
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users',
+            'password' => 'required|min:6|confirmed',
+            'password_confirmation' => 'required|same:password',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try{
+            $user = User::where('email', $request->email)->first();
+            $user->password = Hash::make($request->password);
+            $user->save();
+            return response()->json(['message' => 'Password reset successfully!'], 200);
+        }catch(Exception $e){
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ],500);
         }
     }
 }

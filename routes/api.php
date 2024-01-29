@@ -25,6 +25,8 @@ Route::middleware(['throttle:api'])->controller(UserController::class)->group(fu
     Route::post('login', 'login')->name('user-login');
     Route::post('register', 'register')->name('user-register');
     Route::post('logout', 'logout')->name('user-logout');
+    Route::post('forget-password', 'forgetPassword')->name('user-forget-password');
+    Route::post('reset-password', 'resetPassword')->name('user-reset-password');
 });
 
 Route::middleware(['auth:sanctum', 'api'])->controller(UserController::class)->group(function () {
