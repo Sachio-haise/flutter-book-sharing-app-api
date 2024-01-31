@@ -15,8 +15,8 @@ php artisan route:cache
 echo "Running migrations..."
 php artisan migrate --force
 
-echo "Storage Link..."
-php artisan storage:link --force
+# echo "Storage Link..."
+# php artisan storage:link --force
 
 # echo "Seeding Data..."
 # php artisan db:seed --force
