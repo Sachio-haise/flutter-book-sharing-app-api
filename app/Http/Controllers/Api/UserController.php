@@ -119,7 +119,8 @@ class UserController extends Controller
             $user = User::findOrFail($request->id);
 
             if ($request->hasFile('profile')) {
-                $response = Storage::upload($request->profile, User::class, $user->profile_id, $request->profile);
+                $folderName = 'user_' . $request->name . '_' . mt_rand(100000, 999999);
+                $response = Storage::upload($request->profile, User::class, $user->profile_id, $folderName);
                 if ($response['status'] === 1) {
                     $media_id = $response['data']['id'] ?? null;
                     $user->profile_id = $media_id;
@@ -158,7 +159,8 @@ class UserController extends Controller
             $user = User::findOrFail($request->id);
 
             if ($request->hasFile('profile')) {
-                $response = Storage::upload($request->profile, User::class, $user->profile_id, $request->profile);
+                $folderName = 'user_' . $request->name . '_' . mt_rand(100000, 999999);
+                $response = Storage::upload($request->profile, User::class, $user->profile_id, $folderName);
                 if ($response['status'] === 1) {
                     $media_id = $response['data']['id'] ?? null;
                     $user->profile_id = $media_id;
