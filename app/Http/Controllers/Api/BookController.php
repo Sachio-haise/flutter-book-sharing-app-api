@@ -170,7 +170,7 @@ class BookController extends Controller
 
             if($cart){
                 $cart->delete();
-                return response()->json(['message' => 'Book removed from cart successfully'], 201);
+                return response()->json(['message' => 'Book removed from cart successfully'], 200);
             }else{
                 $cart = new Cart();
                 $cart->user_id = $request->user_id;
