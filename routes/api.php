@@ -36,7 +36,7 @@ Route::middleware(['auth:sanctum', 'api'])->controller(UserController::class)->g
 });
 
 Route::controller(BookController::class)->group(function () {
-        Route::get('books', 'getBooks')->name('get-books');
+    Route::get('books', 'getBooks')->name('get-books');
 });
 
 Route::middleware(['auth:sanctum', 'api'])->controller(BookController::class)->group(function () {
@@ -46,4 +46,5 @@ Route::middleware(['auth:sanctum', 'api'])->controller(BookController::class)->g
     Route::delete('delete-book/{id}', 'deleteBook')->name('delete-book');
     Route::post('react-book', 'reactBook')->name('react-book');
     Route::post('add-to-cart', 'addToCart')->name('add-to-cart');
+    Route::post('book-info','bookInfo')->name('book-info');
 });

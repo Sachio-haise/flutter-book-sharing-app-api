@@ -94,6 +94,30 @@ class BookController extends Controller
         }
     }
 
+    public function bookInfo(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required',
+            'book_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $isInCart = Cart::where('user_id', $request->user_id)->where('book_id', $request->book_id)->exists();
+            $isReacted = Reaction::where('user_id', $request->user_id)->where('book_id', $request->book_id)->exists();
+            return response()->json([
+                'data' => [
+                    'isInCart' => $isInCart,
+                    'isReacted' => $isReacted
+                ],
+            ],200);
+        }catch(Exception $e){
+            return response()->json(['errors' => $e->getMessage()], 500);
+        }
+    }
+
     public function updateBook(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
