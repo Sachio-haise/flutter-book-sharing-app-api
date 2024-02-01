@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Cart;
 use App\Models\MediaStorage;
 use App\Models\Reaction;
 use App\Models\User;
@@ -23,6 +24,8 @@ class BookResource extends JsonResource
             'description' => $this->description,
             'review' => $this->review,
             'status' => $this->status,
+            'isInCart' => Cart::where('book_id', $this->id)->where('user_id', $request->user()->id)->exists(),
+            'isReacted' => Reaction::where('book_id', $this->id)->where('user_id', $request->user()->id)->exists(),
             'photo' => new MediaResource(MediaStorage::findOrFail($this->photo_id)),
             'book' => new MediaResource(MediaStorage::findOrFail($this->book_id)),
             'user' => new UserResource(User::where('id', $this->user_id)->first()),
