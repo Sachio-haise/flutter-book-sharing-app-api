@@ -28,6 +28,8 @@ class BookResource extends JsonResource
             'book' => new MediaResource(MediaStorage::findOrFail($this->book_id)),
             'user' => new UserResource(User::where('id', $this->user_id)->first()),
             'reactions' => Reaction::where('book_id', $this->id)->count(),
+            'carts' => Cart::where('book_id', $this->id)->pluck('user_id'),
+            'react_user' => Reaction::where('book_id', $this->id)->pluck('user_id'),
         ];
     }
 }
